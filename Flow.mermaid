@@ -1,0 +1,174 @@
+flowchart TD
+    subgraph "HR Recruitment Pipeline System"
+        start[Start Recruitment Process] --> JD
+        
+        subgraph "JD Module"
+            JD[Job Description Generator] --> JD_Input[Collect Job Requirements]
+            JD_Input --> JD_AI[AI Generation]
+            JD_AI --> JD_Review[Preview & Edit]
+            JD_Review --> JD_Output[Publish JD]
+        end
+
+        JD_Output --> ATS
+
+        subgraph "ATS Module"
+            ATS[Resume Parser & Matcher] --> ATS_Input[Resume Collection]
+            ATS_Input --> ATS_Parse[Parse Resume]
+            ATS_Parse --> ATS_Match[Match Against JD]
+            ATS_Match --> ATS_Decision[Generate Recommendations]
+            ATS_Decision --> ATS_Output[Selected Candidates]
+        end
+
+        ATS_Output --> OA
+
+        subgraph "OA Module"
+            OA[Online Assessment] --> OA_Input[Parse JD & Resume]
+            OA_Input --> OA_Generate[Generate Questions]
+            OA_Generate --> OA_Test[Candidate Takes Test]
+            OA_Test --> OA_Evaluate[AI Evaluation]
+            OA_Evaluate --> OA_Output[OA Results & Analysis]
+        end
+
+        OA_Output --> Interview
+
+        subgraph "Interview Module"
+            Interview[Dynamic Interview] --> INT_Input[Process JD, Resume & OA Results]
+            INT_Input --> INT_Generate[Generate Interview Questions]
+            INT_Generate --> INT_Categories[Question Categories]
+            INT_Categories --> INT_Technical[Technical Assessment]
+            INT_Categories --> INT_Coding[Coding Challenge]
+            INT_Categories --> INT_System[System Design]
+            INT_Categories --> INT_Behavioral[Behavioral Assessment]
+            INT_Technical & INT_Coding & INT_System & INT_Behavioral --> INT_Guide[Complete Interview Guide]
+            INT_Guide --> INT_Output[Interview Results]
+        end
+
+        Interview --> final[Hiring Decision]
+    end
+
+    %% Detailed JD Module Flow
+    subgraph "JD Module Detailed"
+        JD_D[Job Description Generator] --> JD_Form[Multi-step Form Interface]
+        JD_Form --> JD_Company[Company Info & Values]
+        JD_Form --> JD_Technical[Technical Requirements]
+        JD_Form --> JD_Role[Role Details]
+        JD_Form --> JD_Focus[Specialized Focus]
+        
+        JD_Company & JD_Technical & JD_Role & JD_Focus --> JD_Validate[Validate Inputs]
+        JD_Validate --> JD_Provider[AI Provider Selection]
+        
+        JD_Provider --> JD_Gemini[Google Gemini]
+        JD_Provider --> JD_GPT[OpenAI GPT]
+        
+        JD_Gemini & JD_GPT --> JD_Process[Process Template]
+        JD_Process --> JD_Generated[Generated JD]
+        
+        JD_Generated --> JD_Actions[Actions]
+        JD_Actions --> JD_Export[Export as MD/HTML]
+        JD_Actions --> JD_Preview[Preview Mode]
+        JD_Actions --> JD_Post[Post to Platforms]
+        
+        JD_Post --> JD_Twitter[Twitter]
+        JD_Post --> JD_GoogleJobs[Google Jobs]
+        JD_Post --> JD_OtherPlatforms[Other Platforms]
+    end
+
+    %% Detailed ATS Module Flow
+    subgraph "ATS Module Detailed"
+        ATS_D[Resume Parser & Matcher] --> ATS_Input_D[Input Processing]
+        
+        ATS_Input_D --> ATS_FileProcessing[File Processing]
+        ATS_FileProcessing --> ATS_PDF[PDF Processing]
+        ATS_FileProcessing --> ATS_DOCX[DOCX Processing]
+        ATS_FileProcessing --> ATS_TXT[TXT Processing]
+        
+        ATS_PDF & ATS_DOCX & ATS_TXT --> ATS_ExtractText[Extract Text]
+        ATS_ExtractText --> ATS_ParseAgent[Resume Parsing Agent]
+        ATS_ParseAgent --> ATS_Structure[Structured Resume Data]
+        
+        ATS_Structure --> ATS_JDMatch[Job Matching Process]
+        ATS_JDMatch --> ATS_Requirements[Match Requirements]
+        ATS_JDMatch --> ATS_Skills[Skills Analysis]
+        ATS_JDMatch --> ATS_Experience[Experience Evaluation]
+        
+        ATS_Requirements & ATS_Skills & ATS_Experience --> ATS_Scoring[Generate Scores]
+        ATS_Scoring --> ATS_DecisionEngine[Decision Engine]
+        
+        ATS_DecisionEngine --> ATS_Status[Decision Status]
+        ATS_DecisionEngine --> ATS_Confidence[Confidence Score]
+        ATS_DecisionEngine --> ATS_Stage[Interview Stage]
+        ATS_DecisionEngine --> ATS_Strengths[Key Strengths]
+        ATS_DecisionEngine --> ATS_Concerns[Key Concerns]
+        
+        ATS_Status & ATS_Confidence & ATS_Stage & ATS_Strengths & ATS_Concerns --> ATS_Report[Generate Reports]
+        ATS_Report --> ATS_JSON[JSON Output]
+        ATS_Report --> ATS_UI[UI Display]
+    end
+
+    %% Detailed OA Module Flow
+    subgraph "OA Module Detailed"
+        OA_D[Online Assessment] --> OA_Parser[Input Parser]
+        OA_Parser --> OA_JDExtract[Extract JD Data]
+        OA_Parser --> OA_ResumeExtract[Extract Resume Data]
+        
+        OA_JDExtract & OA_ResumeExtract --> OA_Analysis[Match Analysis]
+        OA_Analysis --> OA_QuestionGen[Question Generator]
+        
+        OA_QuestionGen --> OA_QTypes[Question Types]
+        OA_QTypes --> OA_Coding[Coding Questions]
+        OA_QTypes --> OA_SystemDesign[System Design Questions]
+        OA_QTypes --> OA_Behavioral[Behavioral Questions]
+        
+        OA_Coding & OA_SystemDesign & OA_Behavioral --> OA_Assessment[Complete Assessment]
+        OA_Assessment --> OA_Delivery[Assessment Delivery]
+        
+        OA_Delivery --> OA_Responses[Candidate Responses]
+        OA_Responses --> OA_Evaluator[AI Evaluator]
+        
+        OA_Evaluator --> OA_TechnicalEval[Technical Evaluation]
+        OA_Evaluator --> OA_PassionDetect[Passion Detection]
+        
+        OA_TechnicalEval & OA_PassionDetect --> OA_Feedback[Generate Feedback]
+        OA_Feedback --> OA_Report[Assessment Report]
+        OA_Report --> OA_NextStage[Pass to Interview Stage]
+    end
+
+    %% Detailed Interview Module Flow
+    subgraph "Interview Module Detailed"
+        INT_D[Dynamic Interview] --> INT_Parser[Markdown Parser]
+        INT_Parser --> INT_JDParse[Parse JD]
+        INT_Parser --> INT_ResumeParse[Parse Resume]
+        INT_Parser --> INT_OAParse[Parse OA Results]
+        
+        INT_JDParse & INT_ResumeParse & INT_OAParse --> INT_StructuredData[Structured Data]
+        INT_StructuredData --> INT_LLM[LLM Processing]
+        
+        INT_LLM --> INT_QuestionTypes[Question Types Generator]
+        INT_QuestionTypes --> INT_TechQuestions[Technical Questions]
+        INT_QuestionTypes --> INT_CodeQuestions[Coding Questions]
+        INT_QuestionTypes --> INT_DesignQuestions[System Design Questions]
+        INT_QuestionTypes --> INT_BehavioralQuestions[Behavioral Questions]
+        
+        INT_TechQuestions & INT_CodeQuestions & INT_DesignQuestions & INT_BehavioralQuestions --> INT_InterviewGuide[Complete Interview Guide]
+        
+        INT_InterviewGuide --> INT_Components[Guide Components]
+        INT_Components --> INT_Rationale[Question Rationale]
+        INT_Components --> INT_ExpectedAnswers[Expected Answers]
+        INT_Components --> INT_FollowUps[Follow-up Questions]
+        INT_Components --> INT_Scoring[Scoring Criteria]
+        
+        INT_Rationale & INT_ExpectedAnswers & INT_FollowUps & INT_Scoring --> INT_FinalGuide[Finalized Interview Guide]
+        INT_FinalGuide --> INT_Output_D[Output Results]
+        INT_Output_D --> INT_JSONOutput[JSON Output]
+        INT_Output_D --> INT_MDOutput[Markdown Output]
+    end
+
+    %% Data Flow Between Modules
+    JD_Output -.JD Data.-> ATS_Input
+    JD_Output -.JD Data.-> OA_Input
+    JD_Output -.JD Data.-> INT_Input
+    
+    ATS_Output -.Resume & Match Data.-> OA_Input
+    ATS_Output -.Resume & Match Data.-> INT_Input
+    
+    OA_Output -.OA Results & Analysis.-> INT_Input

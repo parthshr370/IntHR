@@ -1,0 +1,226 @@
+graph TB
+    %% Main Client Interfaces
+    UserClient[Client Browser] <--> WebAPI
+    MobileApp[Mobile Application] <--> MobileAPI
+    
+    %% API Gateway
+    WebAPI[Web API Gateway] <--> APIgateway
+    MobileAPI[Mobile API Gateway] <--> APIgateway
+    APIgateway[API Gateway] <--> AuthService
+    APIgateway <--> ServiceRegistry
+
+    %% Authentication Layer
+    AuthService[Authentication Service] <--> UserDB[(User Database)]
+    AuthService <--> JWT[JWT Token Service]
+    
+    %% Service Registry & Load Balancer
+    ServiceRegistry[Service Registry & Discovery] <--> LoadBalancer[Load Balancer]
+    LoadBalancer <--> CoreServices
+    
+    subgraph CoreServices[Core Services]
+        JobService[JD Service] <--> JDDatabase[(JD Database)]
+        JobService <--> JobCache[(Redis Cache)]
+        
+        ATSService[ATS Service] <--> ResumeDB[(Resume Database)]
+        ATSService <--> MatchDB[(Match Results DB)]
+        
+        OAService[OA Service] <--> AssessmentDB[(Assessment Database)]
+        OAService <--> ResultsDB[(Test Results DB)]
+        
+        InterviewService[Interview Service] <--> InterviewDB[(Interview Database)]
+        InterviewService <--> FeedbackDB[(Feedback Database)]
+        
+        AnalyticsService[Analytics Service] <--> AnalyticsDB[(Analytics Database)]
+    end
+    
+    %% Integrations with AI Services
+    subgraph AIServices[AI Services]
+        LLMOrchestrator[LLM Orchestrator] <--> OpenAIAdapter[OpenAI Adapter]
+        LLMOrchestrator <--> GeminiAdapter[Google Gemini Adapter]
+        LLMOrchestrator <--> AnthropicAdapter[Anthropic Adapter]
+        LLMOrchestrator <--> OpenRouterAdapter[OpenRouter Adapter]
+    end
+    
+    %% External Integrations
+    subgraph ExternalServices[External Services]
+        JobPosting[Job Posting Service] <--> TwitterAPI[Twitter API]
+        JobPosting <--> LinkedInAPI[LinkedIn API]
+        JobPosting <--> GoogleJobsAPI[Google Jobs API]
+        
+        EmailService[Email Service] <--> SMTPGateway[SMTP Gateway]
+        NotificationService[Notification Service] <--> PushNotificationGateway[Push Notification Gateway]
+    end
+    
+    %% File Storage
+    subgraph StorageServices[Storage Services]
+        DocumentProcessor[Document Processor] <--> ObjectStorage[(S3 Object Storage)]
+        PDFService[PDF Service] <--> DocumentProcessor
+        DocxService[DOCX Service] <--> DocumentProcessor
+    end
+    
+    %% Message Queue System
+    subgraph MessageBroker[Message Broker System]
+        Kafka[Kafka Message Broker]
+        JobQueue[Job Processing Queue]
+        NotificationQueue[Notification Queue]
+        AnalyticsQueue[Analytics Event Queue]
+    end
+    
+    %% Job Description Module
+    subgraph JobDescriptionSystem["JD System (Microservices)"]
+        JDCreator[JD Creator Service]
+        JDGenerator[JD AI Generator]
+        JDPublisher[JD Publisher Service]
+        JDTemplateManager[Template Manager]
+        
+        JDCreator <--> JDGenerator
+        JDGenerator <--> JDPublisher
+        JDCreator <--> JDTemplateManager
+    end
+    
+    %% ATS Module
+    subgraph ATSSystem["ATS System (Microservices)"]
+        ResumeParser[Resume Parser Service]
+        JDMatcher[JD Matcher Service]
+        CandidateRanker[Candidate Ranker]
+        DecisionEngine[Decision Engine]
+        
+        ResumeParser <--> JDMatcher
+        JDMatcher <--> CandidateRanker
+        CandidateRanker <--> DecisionEngine
+    end
+    
+    %% OA Module
+    subgraph OASystem["OA System (Microservices)"]
+        QuestionGenerator[Question Generator]
+        AssessmentEngine[Assessment Engine]
+        TestDelivery[Test Delivery Service]
+        ResponseEvaluator[Response Evaluator]
+        
+        QuestionGenerator <--> AssessmentEngine
+        AssessmentEngine <--> TestDelivery
+        TestDelivery <--> ResponseEvaluator
+    end
+    
+    %% Interview Module
+    subgraph InterviewSystem["Interview System (Microservices)"]
+        InterviewPlanner[Interview Planner]
+        QuestionRepository[Question Repository]
+        InterviewGuideGenerator[Guide Generator]
+        FeedbackCollector[Feedback Collector]
+        
+        InterviewPlanner <--> QuestionRepository
+        InterviewPlanner <--> InterviewGuideGenerator
+        InterviewGuideGenerator <--> FeedbackCollector
+    end
+    
+    %% Connections between systems
+    JobService <--> JobDescriptionSystem
+    ATSService <--> ATSSystem
+    OAService <--> OASystem
+    InterviewService <--> InterviewSystem
+    
+    %% AI Service Connections
+    AIServices <--> JobDescriptionSystem
+    AIServices <--> ATSSystem
+    AIServices <--> OASystem
+    AIServices <--> InterviewSystem
+    
+    %% Message Queue Connections
+    JobDescriptionSystem <--> Kafka
+    ATSSystem <--> Kafka
+    OASystem <--> Kafka
+    InterviewSystem <--> Kafka
+    
+    Kafka <--> JobQueue
+    Kafka <--> NotificationQueue
+    Kafka <--> AnalyticsQueue
+    
+    %% Storage Service Connections
+    ATSSystem <--> DocumentProcessor
+    JobDescriptionSystem <--> ObjectStorage
+    OASystem <--> ObjectStorage
+    InterviewSystem <--> ObjectStorage
+    
+    %% External Service Connections
+    JobDescriptionSystem <--> JobPosting
+    ATSSystem <--> EmailService
+    OASystem <--> NotificationService
+    InterviewSystem <--> EmailService
+    
+    %% Analytics
+    JobDescriptionSystem --Events--> AnalyticsQueue
+    ATSSystem --Events--> AnalyticsQueue
+    OASystem --Events--> AnalyticsQueue
+    InterviewSystem --Events--> AnalyticsQueue
+    AnalyticsQueue --> AnalyticsService
+    
+    %% Monitoring & Logging
+    subgraph ObservabilityStack[Observability Stack]
+        PrometheusService[Prometheus Metrics]
+        Grafana[Grafana Dashboards]
+        ElasticSearch[ElasticSearch]
+        Kibana[Kibana Logs]
+        
+        PrometheusService <--> Grafana
+        ElasticSearch <--> Kibana
+    end
+    
+    CoreServices --Metrics--> PrometheusService
+    CoreServices --Logs--> ElasticSearch
+    JobDescriptionSystem --Metrics--> PrometheusService
+    ATSSystem --Metrics--> PrometheusService
+    OASystem --Metrics--> PrometheusService
+    InterviewSystem --Metrics--> PrometheusService
+    
+    %% Infrastructure Layer
+    subgraph InfrastructureLayer[Infrastructure]
+        Kubernetes[Kubernetes Cluster]
+        DockerRegistry[Docker Registry]
+        CICD[CI/CD Pipeline]
+        TerraformIaC[Terraform IaC]
+        
+        CICD <--> DockerRegistry
+        DockerRegistry <--> Kubernetes
+        TerraformIaC --> Kubernetes
+    end
+
+    %% Data Warehouse for Business Intelligence
+    subgraph DataWarehouse[Data Warehouse]
+        ETLPipeline[ETL Pipeline]
+        DataLake[(Data Lake)]
+        WarehouseDB[(Warehouse DB)]
+        BITools[BI Tools]
+        
+        ETLPipeline <--> DataLake
+        DataLake <--> WarehouseDB
+        WarehouseDB <--> BITools
+    end
+    
+    AnalyticsService --> ETLPipeline
+    
+    %% Deployments
+    InfrastructureLayer --- CoreServices
+    InfrastructureLayer --- AIServices
+    InfrastructureLayer --- ExternalServices
+    InfrastructureLayer --- StorageServices
+    InfrastructureLayer --- MessageBroker
+    InfrastructureLayer --- ObservabilityStack
+    InfrastructureLayer --- DataWarehouse
+    
+    %% Data Flow Legend
+    classDef apiGateway fill:#f9a,stroke:#333,stroke-width:2px
+    classDef service fill:#9cf,stroke:#333,stroke-width:1px
+    classDef database fill:#f6f,stroke:#333,stroke-width:1px
+    classDef messaging fill:#9f9,stroke:#333,stroke-width:1px
+    classDef client fill:#fff,stroke:#333,stroke-width:2px
+    classDef auth fill:#ff9,stroke:#333,stroke-width:1px
+    classDef infrastructure fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class UserClient,MobileApp client
+    class WebAPI,MobileAPI,APIgateway apiGateway
+    class AuthService,JWT auth
+    class JobService,ATSService,OAService,InterviewService,AnalyticsService service
+    class JDDatabase,ResumeDB,MatchDB,AssessmentDB,ResultsDB,InterviewDB,FeedbackDB,AnalyticsDB,UserDB,JobCache database
+    class Kafka,JobQueue,NotificationQueue,AnalyticsQueue messaging
+    class Kubernetes,DockerRegistry,CICD,TerraformIaC infrastructure
